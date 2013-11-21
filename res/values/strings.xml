@@ -10,5 +10,14 @@
     <string name="title_activity_display_message">My Message</string>
     <string name="hello_world">Hello world!</string>
     <string name="empty_str"></string>
+    <string name="version">Project Prototype Ver. 0.1</string>
+    <string name="ryerson">Ryerson University</string>
+    <string name="cps613">CPS613 Human Computer Interaction</string>
+    <string name="sean">Chi-Li Sean Kuo 500360387</string>
+    <string name="david">David Huynh 500340107</string>
+    <string name="sajee">Sajeeban Sivayogalingam 500342246</string>
+    <string name="outro">Is that the best you can do?</string>
+    <string name="retryBtn">RETRY</string>
+    <string name="returnBtn">RETURN TO MAIN</string>
 
 </resources>
