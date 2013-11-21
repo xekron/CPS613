@@ -1,43 +1,40 @@
 package com.example.myfirstapp;
 
 import java.util.Random;
-
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+	private final static int NUM_OF_PAIRS = 12;
+	private final Button startButton = (Button) findViewById(R.id.start_button);
+	private final Button stopButton = (Button) findViewById(R.id.stop_button);
 	public long countDownTime; // this value will be set by difficulty.
 	private CountDownTimer initialTimer;
-	private int numOfImages = 25;
-	private static final int MIN_IMAGES = 1;
-	private static final int MAX_IMAGES = 6;
-	private boolean[] matched = { false, false, false, false, false, false, false };
-	private int[] numOfMatched = { 0, 0, 0, 0, 0, 0, 0 };
-
-	public Integer[] thumbIds = { R.drawable.empty, 
-			R.drawable.red_circle, R.drawable.yellow_circle, R.drawable.blue_circle, 
-			R.drawable.green_square, R.drawable.orange_square, R.drawable.purple_square,
-			R.drawable.red_triangle, R.drawable.yellow_triangle, R.drawable.blue_triangle, 
-			R.drawable.green_star, R.drawable.orange_star, R.drawable.purple_star};
-	public Integer[] randomizedThumbs;
+	private Shape shape1, shape2, shape3, shape4;
+	private Shape shape5, shape6, shape7, shape8;
+	private Shape shape9, shape10, shape11, shape12;
+	private Shape[] shapes;
+	private GameButton button1, button2, button3, button4, button5, button6;
+	private GameButton button7, button8, button9, button10, button11, button12;
+	private GameButton button13, button14, button15, button16, button17, button18;
+	private GameButton button19, button20, button21, button22, button23, button24;
+	private GameButton[] buttons;	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		final Button startButton = (Button) findViewById(R.id.start_button);
-		final Button stopButton = (Button) findViewById(R.id.stop_button);
 
+
+		// Hide the stop button initially, bring it back when start is selected
 		stopButton.setVisibility(View.GONE);
 		startButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -48,7 +45,6 @@ public class MainActivity extends Activity {
 				stopButton.setVisibility(View.VISIBLE);
 			}
 		});
-
 		stopButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -58,52 +54,22 @@ public class MainActivity extends Activity {
 				startButton.setVisibility(View.VISIBLE);
 			}
 		});
-
-		// Create a randomized array of all the images
-		randomizedThumbs = new Integer[numOfImages];
+	
+		// Set the button configurations
+		initializeShapesAndButtons();
 		Random r = new Random();
-		int random = 1;
-		int prev = 0;
-		for (int i = 1; i < randomizedThumbs.length; i++) {
+		int random = 0;
+		// We pick a random shape that hasn't already been picked
+		// twice, and assign it each button.
+		for (int i = 0; i < NUM_OF_PAIRS*2; i++) {
 			do {
-			//	while (random == prev) {
-					random = r.nextInt(MAX_IMAGES - MIN_IMAGES + 1) + MIN_IMAGES;
-				//}
-				randomizedThumbs[i] = thumbIds[random];
-			/*	if (numOfMatched[random] == 2)  {
-					matched[random] = true;
-				}
-				else if (numOfMatched[random] < 2){
-					numOfMatched[random]++;
-				}
-				prev = random;*/
-			} while (matched[random] == true);
+				random = r.nextInt(NUM_OF_PAIRS);
+			}
+			while (shapes[random].isAllMatched());
+			
+			buttons[i].setImage(shapes[random].getType());
+			shapes[random].incrementOccurrence();
 		}
-		
-		new GameButton((Button) findViewById(R.id.b1),false,randomizedThumbs,1);
-		new GameButton((Button) findViewById(R.id.b2),false,randomizedThumbs,2);
-		new GameButton((Button) findViewById(R.id.b3),false,randomizedThumbs,3);
-		new GameButton((Button) findViewById(R.id.b4),false,randomizedThumbs,4);
-		new GameButton((Button) findViewById(R.id.b5),false,randomizedThumbs,5);
-		new GameButton((Button) findViewById(R.id.b6),false,randomizedThumbs,6);
-		new GameButton((Button) findViewById(R.id.b7),false,randomizedThumbs,7);
-		new GameButton((Button) findViewById(R.id.b8),false,randomizedThumbs,8);
-		new GameButton((Button) findViewById(R.id.b9),false,randomizedThumbs,9);
-		new GameButton((Button) findViewById(R.id.b10),false,randomizedThumbs,10);
-		new GameButton((Button) findViewById(R.id.b11),false,randomizedThumbs,11);
-		new GameButton((Button) findViewById(R.id.b12),false,randomizedThumbs,12);
-		new GameButton((Button) findViewById(R.id.b13),false,randomizedThumbs,13);
-		new GameButton((Button) findViewById(R.id.b14),false,randomizedThumbs,14);
-		new GameButton((Button) findViewById(R.id.b15),false,randomizedThumbs,15);
-		new GameButton((Button) findViewById(R.id.b16),false,randomizedThumbs,16);
-		new GameButton((Button) findViewById(R.id.b17),false,randomizedThumbs,17);
-		new GameButton((Button) findViewById(R.id.b18),false,randomizedThumbs,18);
-		new GameButton((Button) findViewById(R.id.b19),false,randomizedThumbs,19);
-		new GameButton((Button) findViewById(R.id.b20),false,randomizedThumbs,20);
-		new GameButton((Button) findViewById(R.id.b21),false,randomizedThumbs,21);
-		new GameButton((Button) findViewById(R.id.b22),false,randomizedThumbs,22);
-		new GameButton((Button) findViewById(R.id.b23),false,randomizedThumbs,23);
-		new GameButton((Button) findViewById(R.id.b24),false,randomizedThumbs,24);
 	}
 
 	@Override
@@ -146,6 +112,57 @@ public class MainActivity extends Activity {
 
 	public void stopTimer() {
 		initialTimer.cancel();
+	}
+	
+	private void initializeShapesAndButtons() {
+		shape1 = new Shape(R.drawable.red_circle);
+		shape2 = new Shape(R.drawable.yellow_circle);
+		shape3 = new Shape(R.drawable.blue_circle);
+		shape4 = new Shape(R.drawable.green_square);
+		shape5 = new Shape(R.drawable.orange_square);
+		shape6 = new Shape(R.drawable.purple_square);
+		shape7 = new Shape(R.drawable.red_triangle);
+		shape8 = new Shape(R.drawable.yellow_triangle);
+		shape9 = new Shape(R.drawable.blue_triangle);
+		shape10 = new Shape(R.drawable.green_star);
+		shape11 = new Shape(R.drawable.orange_star);
+		shape12 = new Shape(R.drawable.purple_star);
+		shapes = new Shape[] {
+				shape1, shape2, shape3, shape4, shape5,
+					shape6, shape7, shape8, shape9, shape10, shape11, shape12
+		};
+		
+		
+		button1 = new GameButton((Button) findViewById(R.id.b1));
+		button2 = new GameButton((Button) findViewById(R.id.b2));
+		button3 = new GameButton((Button) findViewById(R.id.b3));
+		button4 = new GameButton((Button) findViewById(R.id.b4));
+		button5 = new GameButton((Button) findViewById(R.id.b5));
+		button6 = new GameButton((Button) findViewById(R.id.b6));
+		button7 = new GameButton((Button) findViewById(R.id.b7));
+		button8 = new GameButton((Button) findViewById(R.id.b8));
+		button9 = new GameButton((Button) findViewById(R.id.b9));
+		button10 = new GameButton((Button) findViewById(R.id.b10));
+		button11 = new GameButton((Button) findViewById(R.id.b11));
+		button12 = new GameButton((Button) findViewById(R.id.b12));
+		button13 = new GameButton((Button) findViewById(R.id.b13));
+		button14 = new GameButton((Button) findViewById(R.id.b14));
+		button15 = new GameButton((Button) findViewById(R.id.b15));
+		button16 = new GameButton((Button) findViewById(R.id.b16));
+		button17 = new GameButton((Button) findViewById(R.id.b17));
+		button18 = new GameButton((Button) findViewById(R.id.b18));
+		button19 = new GameButton((Button) findViewById(R.id.b19));
+		button20 = new GameButton((Button) findViewById(R.id.b20));
+		button21 = new GameButton((Button) findViewById(R.id.b21));
+		button22 = new GameButton((Button) findViewById(R.id.b22));
+		button23 = new GameButton((Button) findViewById(R.id.b23));
+		button24 = new GameButton((Button) findViewById(R.id.b24));
+		buttons = new GameButton [] {
+				button1, button2, button3, button4, button5, button6,
+				button7, button8, button9, button10, button11, button12,
+				button13, button14, button15, button16, button17, button18,
+				button19, button20, button21, button22, button23, button24,
+		};
 	}
 
 }
