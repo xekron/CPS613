@@ -14,8 +14,6 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
 	public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
 	private final static int NUM_OF_PAIRS = 12;
-	private final Button startButton = (Button) findViewById(R.id.start_button);
-	private final Button stopButton = (Button) findViewById(R.id.stop_button);
 	public long countDownTime; // this value will be set by difficulty.
 	private CountDownTimer initialTimer;
 	private Shape shape1, shape2, shape3, shape4;
@@ -26,14 +24,15 @@ public class MainActivity extends Activity {
 	private GameButton button7, button8, button9, button10, button11, button12;
 	private GameButton button13, button14, button15, button16, button17, button18;
 	private GameButton button19, button20, button21, button22, button23, button24;
-	private GameButton[] buttons;	
+	private GameButton[] buttons;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-
+		final Button startButton = (Button) findViewById(R.id.start_button);
+		final Button stopButton = (Button) findViewById(R.id.stop_button);
 		// Hide the stop button initially, bring it back when start is selected
 		stopButton.setVisibility(View.GONE);
 		startButton.setOnClickListener(new OnClickListener() {
@@ -70,13 +69,10 @@ public class MainActivity extends Activity {
 			buttons[i].setImage(shapes[random].getType());
 			shapes[random].incrementOccurrence();
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+		
+		// Now we must disable all buttons to start with
+		enableButtons(false);
+		
 	}
 
 	public void startTimer(View view) {
@@ -89,9 +85,15 @@ public class MainActivity extends Activity {
 	public void startTimer(long countDownTime) {
 		final TextView textView = (TextView) findViewById(R.id.timer_message);
 		// TODO: Get difficulty, set countdown time
+		
+		// Flip all the cards for a specified amount of time to show the user
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].flip();
+		}
+		
 		initialTimer = new CountDownTimer(countDownTime, 1) {
 			public void onTick(long millisUntilFinished) {
-				textView.setTextSize(20);
+				textView.setTextSize(30);
 				textView.setTextColor(Color.BLACK);
 				textView.setText(" " + (millisUntilFinished / 1000) / 60 + ":"
 						+ millisUntilFinished / 1000 + ":"
@@ -103,15 +105,70 @@ public class MainActivity extends Activity {
 			 * Or show the results screen
 			 */
 			public void onFinish() {
-				textView.setText(" Time's Up!");
-				textView.setTextSize(20);
+				textView.setText(" Get ready...");
+				textView.setTextSize(30);
 				textView.setTextColor(Color.RED);
+				
+				// Flip all the cards back
+				for (int i = 0; i < buttons.length; i++) {
+					buttons[i].flip();
+				}
+				//TODO: Countdown changed dependent on difficulty
+				startGameTimer(60000);
 			}
 		}.start();
 	}
 
 	public void stopTimer() {
 		initialTimer.cancel();
+	}
+	
+	
+	public void startGameTimer(long countDownTime) {
+		final TextView textView = (TextView) findViewById(R.id.timer_message);
+		// TODO: Get difficulty, set countdown time
+		
+		// Enable the buttons for game time.
+		enableButtons(true);
+		
+		initialTimer = new CountDownTimer(countDownTime, 1) {
+			public void onTick(long millisUntilFinished) {
+				textView.setTextSize(30);
+				textView.setTextColor(Color.BLACK);
+				textView.setText(" " + (millisUntilFinished / 1000) / 60 + ":"
+						+ (millisUntilFinished / 1000) % 60 + ":"
+						+ millisUntilFinished % 1000);
+			}
+
+			/**
+			 * On finish, we want to either start the next timer and main game
+			 * Or show the results screen
+			 */
+			public void onFinish() {
+				textView.setText(" Time's up!!\n Num Matched: " + GameButton.numMatched );
+				textView.setTextSize(30);
+				textView.setTextColor(Color.RED);
+				enableButtons(false);
+				
+				//TODO
+				// We want to send the user to the results screen now, with the numbers
+				// correctly matched and total pairs.
+			}
+		}.start();
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	private void enableButtons(boolean enable) {
+		// Enable the buttons for game time.
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].setEnabled(enable);
+		}
 	}
 	
 	private void initializeShapesAndButtons() {
